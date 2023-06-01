@@ -1,3 +1,4 @@
+import datetime
 import requests
 import time
 import logging
@@ -31,16 +32,28 @@ def check_website(url):
     except requests.exceptions.RequestException as e:
         logger.error(f"{url} is down with an exception: {str(e)}.")
 
+from discord_webhook import DiscordWebhook, DiscordEmbed
+
 if __name__ == "__main__":
-    website_url = "https://www.example.com/"
+    website_url = "WEBSITE_URL_TO_CHECK"
 
     logger = setup_logger()
 
     while True:
         try:
-            logger.info("===================================")  
-            check_website(website_url)
+             webhook = DiscordWebhook(url='WEBHOOK_URL_HERE', username="WEBHOOK_NAME")
+             with open("website_checker.log", "rb") as f:
+                  webhook.add_file(file=f.read(), filename='website_checker.log')
+                  embed = DiscordEmbed(title='website_checker', description='Logs:', color='7289da')
+                  embed.set_image(url='IMAGE_URL_HERE')
+                  embed.set_timestamp()
+                  webhook.add_embed(embed)
+                  response = webhook.execute()
+                  webhook = DiscordWebhook(url='WEBHOOK_URL_HERE', content='   ```============================================================================================================================================```')
+                  response = webhook.execute()
+                  logger.info("===================================")  
+                  check_website(website_url)
         except Exception as e:
             logger.error(f"An error occurred while checking the website: {str(e)}")
         
-        time.sleep(3600)
+        time.sleep(1800)
